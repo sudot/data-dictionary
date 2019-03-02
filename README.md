@@ -21,6 +21,7 @@ DROP TABLE IF EXISTS `table_name_01`;
 CREATE TABLE `table_name_01` (
 `id`  bigint NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `name`  varchar(255) NULL COMMENT '姓名' ,
+`memo`  varchar(255) NULL COMMENT '演示一个有很长很长的备注字段。假设有一个性别字段值和释义的映射为->1：男性，0：女性' ,
 PRIMARY KEY (`id`)
 ) ENGINE = InnoDB COMMENT='测试表-01'
 ;
@@ -29,22 +30,25 @@ DROP TABLE IF EXISTS `table_name_02`;
 CREATE TABLE `table_name_02` (
 `id`  bigint NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `name`  varchar(255) NULL COMMENT '姓名' ,
+`memo`  varchar(255) NULL COMMENT '演示一个有很长很长的备注字段。假设有一个性别字段值和释义的映射为->1：男性，0：女性' ,
 PRIMARY KEY (`id`)
 ) ENGINE = InnoDB COMMENT='测试表-02'
 ;
 
 DROP TABLE IF EXISTS `table_name_03`;
 CREATE TABLE `table_name_03` (
-`id`  bigint UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `name`  varchar(255) NULL COMMENT '姓名' ,
+`memo`  varchar(255) NULL COMMENT '演示一个有很长很长的备注字段。假设有一个性别字段值和释义的映射为->1：男性，0：女性' ,
 PRIMARY KEY (`id`)
 ) ENGINE = InnoDB COMMENT='测试表-03'
 ;
 
 DROP TABLE IF EXISTS `table_name_04`;
 CREATE TABLE `table_name_04` (
-`id`  bigint UNSIGNED ZEROFILL NOT NULL AUTO_INCREMENT COMMENT '主键' ,
+`id`  bigint NOT NULL AUTO_INCREMENT COMMENT '主键' ,
 `name`  varchar(255) NULL COMMENT '姓名' ,
+`memo`  varchar(255) NULL COMMENT '演示一个有很长很长的备注字段。假设有一个性别字段值和释义的映射为->1：男性，0：女性' ,
 PRIMARY KEY (`id`)
 ) ENGINE = InnoDB COMMENT='测试表-04'
 ;
