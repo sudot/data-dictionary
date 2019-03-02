@@ -2,7 +2,7 @@ url=jdbc:mysql://127.0.0.1:3306/test?useUnicode=yes&characterEncoding=UTF8&useSS
 user=root
 password=root
 schema=test
-exclude-tables-string=table_name_03, table_name_04, table_name_05
+exclude-tables-string=table_name_01, table_name_03
 file-path=D:/test-mysql.xlsx
 
 #url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
@@ -17,9 +17,9 @@ file-path=D:/test-mysql.xlsx
 #user=root
 ##数据库登录密码
 #password=root
-##需要生成数据字典的数据库名称
+##需要生成数据字典的数据库名称(MySql有效)
 #schema=test
 ##不生成数据字典的数据库表名
-#exclude-tables-string=table_name_03, table_name_04, table_name_05
+#exclude-tables-string=table_name_01, table_name_03
 ##数据字典存储路径
 #file-path=D:/test-mysql.xlsx
