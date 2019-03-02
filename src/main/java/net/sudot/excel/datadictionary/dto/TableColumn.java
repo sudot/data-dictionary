@@ -17,6 +17,7 @@ public class TableColumn {
     private String columnName;
     private String columnType;
     private String columnKey;
+    private String columnUnique;
     private String isNullable;
     private String columnDefault;
     private String columnComment;

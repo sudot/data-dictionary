@@ -7,7 +7,8 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 /**
  * 单元格样式处理工具
@@ -15,6 +16,9 @@ import java.nio.charset.StandardCharsets;
  * @author tangjialin on 2019-03-01.
  */
 public abstract class CellUtils {
+    private static final Charset CHARSET = Charset.forName("GBK");
+    private static final Pattern PATTERN = Pattern.compile("[A-Z_]+");
+    private static final int LENGTH = 5;
 
     public static Cell addCellStyle(Cell cell) {
         cell.setCellType(CellType.STRING);
@@ -31,7 +35,10 @@ public abstract class CellUtils {
     }
 
     public static int calcColumnTextLength(String text, int maxLength) {
-        int length = text == null ? maxLength : text.getBytes(StandardCharsets.UTF_8).length;
+        if (text == null) { return maxLength; }
+        int length = text.getBytes(CHARSET).length;
+        // 优化大写字母导致宽度不够
+        length += PATTERN.matcher(text).matches() ? length / LENGTH : 0;
         return length > maxLength ? length : maxLength;
     }
 

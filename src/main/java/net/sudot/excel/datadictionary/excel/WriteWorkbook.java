@@ -1,6 +1,9 @@
 package net.sudot.excel.datadictionary.excel;
 
 import net.sudot.excel.datadictionary.Constant;
+import net.sudot.excel.datadictionary.dao.MySqlTableDao;
+import net.sudot.excel.datadictionary.dao.OracleTableDao;
+import net.sudot.excel.datadictionary.dao.TableDao;
 import net.sudot.excel.datadictionary.dto.InParameter;
 import net.sudot.excel.datadictionary.dto.Table;
 import net.sudot.excel.datadictionary.dto.TableColumn;
@@ -17,16 +20,13 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 表格写出
@@ -37,6 +37,7 @@ public abstract class WriteWorkbook {
     static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName("oracle.jdbc.OracleDriver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -45,8 +46,7 @@ public abstract class WriteWorkbook {
     /**
      * 写入文件操作
      *
-     * @param inParameter
-     * @throws Exception
+     * @param inParameter 输入参数
      */
     public static void write(InParameter inParameter) {
         Set<String> excludeTables = new HashSet<>();
@@ -57,8 +57,14 @@ public abstract class WriteWorkbook {
 
         try (Connection connection = DriverManager.getConnection(inParameter.getUrl(), inParameter.getUser(), inParameter.getPassword())) {
             connection.setReadOnly(true);
-            List<Table> tables = loadTable(connection, inParameter.getSchema(), excludeTables);
-            Map<String, List<TableColumn>> tableColumns = loadTableColumns(connection, inParameter.getSchema(), excludeTables);
+            String databaseProductName = connection.getMetaData().getDatabaseProductName();
+            TableDao tableDao = new MySqlTableDao(connection, excludeTables);
+            if ("Oracle".equals(databaseProductName)) {
+                tableDao = new OracleTableDao(connection, excludeTables);
+            }
+            List<Table> tables = tableDao.listTables(inParameter.getSchema());
+            List<String> tableNames = tables.stream().map(Table::getName).collect(Collectors.toList());
+            Map<String, List<TableColumn>> tableColumns = tableDao.listTableColumns(inParameter.getSchema(), tableNames);
 
             Workbook workbook = drawCatalogue(WorkbookFactory.create(true), tables);
             drawTableColumns(workbook, tables, tableColumns);
@@ -69,67 +75,6 @@ public abstract class WriteWorkbook {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * 获取所有的数据表信息
-     *
-     * @param connection    数据库连接对象
-     * @param schema        数据库名称
-     * @param excludeTables 需要排除的表名
-     * @return 返回数据表信息
-     */
-    public static List<Table> loadTable(Connection connection, String schema, Set<String> excludeTables) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(Constant.TABLES_SQL)) {
-            preparedStatement.setString(1, schema);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Table> tables = new ArrayList<>();
-            while (resultSet.next()) {
-                String tableName = resultSet.getString("TABLE_NAME");
-                if (excludeTables.contains(tableName)) { continue;}
-                tables.add(new Table()
-                        .setName(tableName)
-                        .setComment(resultSet.getString("TABLE_COMMENT")));
-            }
-            return tables;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 获取所有的数据表信息
-     *
-     * @param connection    数据库连接对象
-     * @param schema        数据库名称
-     * @param excludeTables 需要排除的表名
-     * @return 返回数据表信息
-     */
-    public static Map<String, List<TableColumn>> loadTableColumns(Connection connection, String schema, Set<String> excludeTables) {
-        Map<String, List<TableColumn>> tableColumns = new HashMap<>();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(Constant.TABLES_COLUMN_SQL)) {
-            preparedStatement.setString(1, schema);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    String tableName = resultSet.getString("TABLE_NAME");
-                    if (excludeTables.contains(tableName)) { continue;}
-                    List<TableColumn> columnList = Optional.ofNullable(tableColumns.get(tableName)).orElseGet(ArrayList::new);
-                    tableColumns.put(tableName, columnList);
-                    columnList.add(new TableColumn()
-                            .setTableName(tableName)
-                            .setColumnName(resultSet.getString("COLUMN_NAME"))
-                            .setColumnType(resultSet.getString("COLUMN_TYPE"))
-                            .setColumnKey(resultSet.getString("COLUMN_KEY"))
-                            .setIsNullable(resultSet.getString("IS_NULLABLE"))
-                            .setColumnDefault(resultSet.getString("COLUMN_DEFAULT"))
-                            .setColumnComment(resultSet.getString("COLUMN_COMMENT")));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return tableColumns;
     }
 
     /**
@@ -177,6 +122,8 @@ public abstract class WriteWorkbook {
      */
     public static Workbook drawTableColumns(Workbook workbook, List<Table> tables, Map<String, List<TableColumn>> tableColumns) {
         tables.forEach(table -> {
+            List<TableColumn> columnList = tableColumns.get(table.getName());
+            if (columnList == null) { return; }
             Map<Integer, Integer> columnTextLengthMap = new HashMap<>();
             Sheet sheet = drawTablesSheetHeader(workbook, table);
             int dataRowIndex = 3;
@@ -186,10 +133,11 @@ public abstract class WriteWorkbook {
             CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("字段名\r\nName");
             CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("字段类型\r\nType");
             CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("主键\r\nPrimary");
+            CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("唯一\r\nUnique");
             CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("空值\r\nNullable");
             CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("缺省\r\nDefault");
             CellUtils.addCellStyleAtHeader(workbook, headerRow.createCell(++firstCellIndex)).setCellValue("注释\r\nComments");
-            Iterator<TableColumn> iterator = tableColumns.get(table.getName()).iterator();
+            Iterator<TableColumn> iterator = columnList.iterator();
             for (int rowIndex = dataRowIndex; iterator.hasNext(); rowIndex++) {
                 firstCellIndex = -1;
                 TableColumn column = iterator.next();
@@ -198,6 +146,7 @@ public abstract class WriteWorkbook {
                 columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getColumnName(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
                 columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getColumnType(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
                 columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getColumnKey(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
+                columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getColumnUnique(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
                 columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getIsNullable(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
                 columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getColumnDefault(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
                 columnTextLengthMap.put(++firstCellIndex, CellUtils.drawColumnText(row, firstCellIndex, column.getColumnComment(), columnTextLengthMap.getOrDefault(firstCellIndex, Constant.DEFAULT_COLUMN_TEXT_LENGTH)));
@@ -219,26 +168,33 @@ public abstract class WriteWorkbook {
     public static Sheet drawTablesSheetHeader(Workbook workbook, Table table) {
         Sheet sheet = workbook.createSheet(table.getName());
         int rowIndex = -1;
-        Row row = sheet.createRow(++rowIndex);
-        row.createCell(0).setCellValue("表名");
-        row.createCell(1).setCellValue(table.getName());
+        int mergedLastCellIndex = 7;
+        {
+            Row row = sheet.createRow(++rowIndex);
+            row.createCell(0).setCellValue("表名");
+            row.createCell(1).setCellValue(table.getName());
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, mergedLastCellIndex));
 
-        CreationHelper createHelper = workbook.getCreationHelper();
-        Hyperlink hyperlink = createHelper.createHyperlink(HyperlinkType.DOCUMENT);
-        hyperlink.setAddress(String.format("%s!A1", Constant.HOME_SHEET_NAME));
-        Cell cell = row.createCell(7);
-        cell.setCellValue("返回首页");
-        cell.setHyperlink(hyperlink);
-        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, 6));
+            CreationHelper createHelper = workbook.getCreationHelper();
+            Hyperlink hyperlink = createHelper.createHyperlink(HyperlinkType.DOCUMENT);
+            hyperlink.setAddress(String.format("%s!A1", Constant.HOME_SHEET_NAME));
+            Cell cell = row.createCell(mergedLastCellIndex + 1);
+            cell.setCellValue("返回首页");
+            cell.setHyperlink(hyperlink);
+        }
 
-        row = sheet.createRow(++rowIndex);
-        row.createCell(0).setCellValue("注释");
-        row.createCell(1).setCellValue(table.getComment());
-        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, 6));
+        {
+            Row row = sheet.createRow(++rowIndex);
+            row.createCell(0).setCellValue("注释");
+            row.createCell(1).setCellValue(table.getComment());
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, mergedLastCellIndex));
+        }
 
-        row = sheet.createRow(++rowIndex);
-        row.createCell(0).setCellValue("详细说明");
-        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, 6));
+        {
+            Row row = sheet.createRow(++rowIndex);
+            row.createCell(0).setCellValue("详细说明");
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 1, mergedLastCellIndex));
+        }
         return sheet;
     }
 

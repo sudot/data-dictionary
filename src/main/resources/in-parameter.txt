@@ -1,0 +1,25 @@
+url=jdbc:mysql://127.0.0.1:3306/test?useUnicode=yes&characterEncoding=UTF8&useSSL=false&serverTimezone=Asia/Shanghai
+user=root
+password=root
+schema=test
+exclude-tables-string=table_name_03, table_name_04, table_name_05
+file-path=D:/test-mysql.xlsx
+
+#url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+#user=scott
+#password=tiger
+#exclude-tables-string=TABLE_NAME_03, TABLE_NAME_04, TABLE_NAME_05
+#file-path=D:/test-oracle.xlsx
+
+##数据库连接
+#url=jdbc:mysql://127.0.0.1:3306/test?useUnicode=yes&characterEncoding=UTF8&useSSL=false&serverTimezone=Asia/Shanghai
+##数据库登录用户
+#user=root
+##数据库登录密码
+#password=root
+##需要生成数据字典的数据库名称
+#schema=test
+##不生成数据字典的数据库表名
+#exclude-tables-string=table_name_03, table_name_04, table_name_05
+##数据字典存储路径
+#file-path=D:/test-mysql.xlsx

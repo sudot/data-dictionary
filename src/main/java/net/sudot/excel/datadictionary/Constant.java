@@ -14,14 +14,6 @@ public interface Constant {
     Pattern SPLIT_PATTERN = Pattern.compile("[\\s,;]");
     String HOME_SHEET_NAME = "总目录";
     int DEFAULT_COLUMN_TEXT_LENGTH = CellUtils.calcColumnTextLength("哈哈哈哈", 0);
-    /** 获取指定数据库所有表信息 */
-    String TABLES_SQL = "SELECT TABLE_NAME,TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME ASC";
-    /**
-     * TABLE_NAME           COLUMN_NAME             COLUMN_TYPE     COLUMN_KEY    IS_NULLABLE     COLUMN_DEFAULT    COLUMN_COMMENT
-     * test_table_01        id                      varchar(32)     PRI           NO              ""	            主键id
-     * test_table_01        updated_date            datetime        ""            YES                               更新时间
-     * test_table_02        version                 int(11)         ""            YES                               版本
-     */
-    String TABLES_COLUMN_SQL = "SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, COLUMN_KEY, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_COMMENT FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME ASC, CASE COLUMN_KEY WHEN 'PRI' THEN 0 ELSE 1 END ASC, COLUMN_NAME ASC";
-
+    /** 包含的表 */
+    Pattern INCLUDE_TABLE_NAME_PATTERN = Pattern.compile("\\$INCLUDE_TABLE_NAME\\$");
 }

@@ -19,6 +19,6 @@ public class InParameter implements Serializable {
     private String user;
     private String password;
     private String schema;
-    private String filePath;
     private String excludeTablesString;
+    private String filePath;
 }
