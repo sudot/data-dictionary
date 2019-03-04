@@ -24,7 +24,7 @@ public class OracleTableDao implements TableDao {
     private static final String TABLES_SQL = "SELECT TABLE_NAME,COMMENTS FROM USER_TAB_COMMENTS ORDER BY TABLE_NAME ASC";
     /**
      * TABLE_NAME       COLUMN_NAME     DATA_TYPE    DATA_LENGTH    COLUMN_KEY    COLUMN_UNIQUE    NULLABLE    DATA_DEFAULT    COMMENTS
-     * test_table_01    id              varchar      32             Y             Y                N           ""	           主键id
+     * test_table_01    id              varchar      32             Y             Y                N           ""              主键id
      * test_table_01    updated_date    date         0              N             N                Y                           更新时间
      * test_table_02    version         NUMBER       0              N             N                Y                           版本
      */
@@ -33,8 +33,8 @@ public class OracleTableDao implements TableDao {
             "        T.COLUMN_NAME,\n" +
             "        T.DATA_TYPE,\n" +
             "        T.DATA_LENGTH,\n" +
-            "        DECODE(UC.COLUMN_KEY, 1, 'Y', 'N') AS \"COLUMN_KEY\",\n" +
-            "        DECODE(UC.COLUMN_UNIQUE, 0, 'Y', 'N') AS \"COLUMN_UNIQUE\",\n" +
+            "        DECODE(UC.COLUMN_KEY, 1, 'Y', 'N') AS COLUMN_KEY,\n" +
+            "        DECODE(UC.COLUMN_UNIQUE, 0, 'Y', 'N') AS COLUMN_UNIQUE,\n" +
             "        T.NULLABLE,\n" +
             "        T.DATA_DEFAULT,\n" +
             "        C.COMMENTS\n" +

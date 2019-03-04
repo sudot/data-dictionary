@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public abstract class CellUtils {
     private static final Charset CHARSET = Charset.forName("GBK");
-    private static final Pattern PATTERN = Pattern.compile("[A-Z_]+");
+    private static final Pattern PATTERN = Pattern.compile("[A-Z]+");
     private static final int LENGTH = 5;
 
     public static Cell addCellStyle(Cell cell) {
@@ -38,7 +38,7 @@ public abstract class CellUtils {
         if (text == null) { return maxLength; }
         int length = text.getBytes(CHARSET).length;
         // 优化大写字母导致宽度不够
-        length += PATTERN.matcher(text).matches() ? length / LENGTH : 0;
+        length += PATTERN.matcher(text).find() ? length / LENGTH : 0;
         return length > maxLength ? length : maxLength;
     }
 
