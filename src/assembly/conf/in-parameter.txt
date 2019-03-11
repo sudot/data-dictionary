@@ -3,13 +3,13 @@ user=root
 password=root
 schema=test
 exclude-tables-string=table_name_01, table_name_03
-file-path=D:/test-mysql.xlsx
+file-path=test-mysql.xlsx
 
 #url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
 #user=scott
 #password=tiger
 #exclude-tables-string=TABLE_NAME_03, TABLE_NAME_04, TABLE_NAME_05
-#file-path=D:/test-oracle.xlsx
+#file-path=test-oracle.xlsx
 
 ##数据库连接
 #url=jdbc:mysql://127.0.0.1:3306/test?useUnicode=yes&characterEncoding=UTF8&useSSL=false&serverTimezone=Asia/Shanghai
