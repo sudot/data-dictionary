@@ -5,6 +5,9 @@ import net.sudot.excel.datadictionary.excel.WriteWorkbook;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -15,11 +18,29 @@ import java.util.regex.Pattern;
  */
 public class Appcation {
     private static final Pattern PATTERN = Pattern.compile("(/|\\d\\:).*");
+    private static final String CONFIG_FILE = "in-parameter.txt";
 
     public static void main(String[] args) throws Exception {
         Properties properties = new Properties();
         File file = new File(System.getProperty("sun.java.command"));
-        properties.load(new FileInputStream(new File(file.getParent(), "conf/in-parameter.txt")));
+        InputStream stream;
+        if (Appcation.class.getName().equals(file.getPath())) {
+            stream = ClassLoader.getSystemResourceAsStream(CONFIG_FILE);
+            if (stream == null) {
+                System.err.printf("\n缺少配置文件【%s】\n", CONFIG_FILE);
+                return;
+            }
+        } else {
+            File configFile = new File(file.getParent(), CONFIG_FILE);
+            if (!configFile.exists()) {
+                System.err.printf("\n缺少配置文件【%s】\n", CONFIG_FILE);
+                return;
+            }
+            stream = new FileInputStream(configFile);
+        }
+        try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+            properties.load(reader);
+        }
         InParameter inParameter = new InParameter();
         inParameter.setUrl(properties.getProperty("url"));
         inParameter.setUser(properties.getProperty("user"));
