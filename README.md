@@ -13,7 +13,7 @@
 3. 运行`net.sudot.excel.datadictionary.Appcation`类的`main`方法
 
 ### 使用编译包运行
-1. [点此下载运行包](https://github.com/sudot/data-dictionary/releases/download/v1.0/data-dictionary-1.0-release.zip)
+1. [点此下载运行包](https://github.com/sudot/data-dictionary/releases/download/v1.1/data-dictionary-1.1-release.zip)
 2. 解压后修改文件`in-parameter.txt`
 3. 双击加压后`run.bat`脚本即可生成数据字典
 
