@@ -4,7 +4,7 @@
 - MySql
 - Oracle
 
-### 项目运行
+### 拉取源码在开发工具运行
 1. 拉取项目代码
     ```
     git clone git@github.com:sudot/data-dictionary.git
@@ -12,9 +12,9 @@
 2. 修改文件`src/main/resources/in-parameter.txt`相关信息
 3. 运行`net.sudot.excel.datadictionary.Appcation`类的`main`方法
 
-### 运行包使用方式
+### 使用编译包运行
 1. [点此下载运行包](https://github.com/sudot/data-dictionary/releases/download/v1.0/data-dictionary-1.0-release.zip)
-2. 解压后修改文件`conf/in-parameter.txt`
+2. 解压后修改文件`in-parameter.txt`
 3. 双击加压后`run.bat`脚本即可生成数据字典
 
 #### 结果预览
