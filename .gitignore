@@ -5,8 +5,10 @@
 /*
 
 #以下是排除忽略的文件,即:加入版本控制的文件
-!images
 !src
-!pom.xml
+!images
+!main.go
+!go.mod
 !README.md
+!in-parameter.ini
 !/*.gitignore
