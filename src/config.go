@@ -7,10 +7,12 @@ import (
 )
 
 type Config struct {
-	Host     string
-	User     string
-	Password string
-	Schema   string
+	Host          string
+	User          string
+	Password      string
+	Schema        string
+	ExcludeTables string
+	FilePath      string
 }
 
 var ConfigValue Config
@@ -26,10 +28,12 @@ func init() {
 		os.Exit(-1)
 	}
 	ConfigValue = Config{
-		Host:     getConfigValue(cfg, "host"),
-		User:     getConfigValue(cfg, "user"),
-		Password: getConfigValue(cfg, "password"),
-		Schema:   getConfigValue(cfg, "schema"),
+		Host:          getConfigValue(cfg, "host"),
+		User:          getConfigValue(cfg, "user"),
+		Password:      getConfigValue(cfg, "password"),
+		Schema:        getConfigValue(cfg, "schema"),
+		ExcludeTables: getConfigValue(cfg, "exclude-tables-string"),
+		FilePath:      getConfigValue(cfg, "file-path"),
 	}
 }
 

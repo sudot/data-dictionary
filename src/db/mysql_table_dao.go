@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"os"
+	"strings"
 	"sudot.net/sudot/data-dictionary/src"
 )
 
@@ -38,8 +38,9 @@ func Connection(config src.Config) []map[string]string {
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", config.User, config.Password, config.Host, config.Schema))
 	if err != nil {
 		fmt.Println("数据库连接失败", err)
-		os.Exit(-1)
+		return nil
 	}
+	defer db.Close()
 	query, err := db.Query(TablesSql, config.Schema)
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
@@ -47,6 +48,10 @@ func Connection(config src.Config) []map[string]string {
 	}
 	defer query.Close()
 
+	set := src.New()
+	for _, v := range strings.Split(config.ExcludeTables, ",") {
+		set.Add(v)
+	}
 	var tableName, tableComment string
 	tableColumnCommentMap := make(map[string]string)
 	for query.Next() {
@@ -55,13 +60,14 @@ func Connection(config src.Config) []map[string]string {
 			return nil
 		}
 		fmt.Println(tableName, tableComment)
-		if tableName == "" {
+		if set.Contains(tableName) {
 			continue
 		}
 		tableColumnCommentMap[tableName] = tableComment
 	}
 
 	query, err = db.Query(TablesColumnSql, config.Schema)
+	defer query.Close()
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
 		return nil
@@ -72,11 +78,9 @@ func Connection(config src.Config) []map[string]string {
 			fmt.Println("查询失败", TablesColumnSql, err)
 			return nil
 		}
-		fmt.Println(tableColumn.TableName, tableColumn.ColumnName, tableColumn.ColumnType, tableColumn.ColumnKey, tableColumn.ColumnUnique, tableColumn.IsNullable, tableColumn.ColumnDefault, tableColumn.ColumnComment)
-		if tableName == "" {
+		if set.Contains(tableName) {
 			continue
 		}
 	}
-	query.Close()
 	return make([]map[string]string, 0)
 }
