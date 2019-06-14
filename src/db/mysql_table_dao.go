@@ -34,19 +34,22 @@ const TablesColumnSql string = "" +
 	"         CASE COL.COLUMN_KEY WHEN 'PRI' THEN 0 ELSE 1 END ASC,\n" +
 	"         COL.COLUMN_NAME ASC"
 
-func Connection(config src.Config) []map[string]string {
+func init() {
+}
+
+func Connection(config src.Config) []TableColumn {
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", config.User, config.Password, config.Host, config.Schema))
 	if err != nil {
 		fmt.Println("数据库连接失败", err)
 		return nil
 	}
 	defer db.Close()
-	query, err := db.Query(TablesSql, config.Schema)
+	rows, err := db.Query(TablesSql, config.Schema)
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
 		return nil
 	}
-	defer query.Close()
+	defer rows.Close()
 
 	set := src.New()
 	for _, v := range strings.Split(config.ExcludeTables, ",") {
@@ -54,33 +57,35 @@ func Connection(config src.Config) []map[string]string {
 	}
 	var tableName, tableComment string
 	tableColumnCommentMap := make(map[string]string)
-	for query.Next() {
-		if err := query.Scan(&tableName, &tableComment); err != nil {
+	for rows.Next() {
+		if err := rows.Scan(&tableName, &tableComment); err != nil {
 			fmt.Println("查询失败", TablesSql, err)
 			return nil
 		}
-		fmt.Println(tableName, tableComment)
 		if set.Contains(tableName) {
 			continue
 		}
 		tableColumnCommentMap[tableName] = tableComment
 	}
 
-	query, err = db.Query(TablesColumnSql, config.Schema)
-	defer query.Close()
+	rows, err = db.Query(TablesColumnSql, config.Schema)
+	defer rows.Close()
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
 		return nil
 	}
-	for query.Next() {
-		tableColumn := TableColumn{}
-		if err := query.Scan(&tableColumn.TableName, &tableColumn.ColumnName, &tableColumn.ColumnType, &tableColumn.ColumnKey, &tableColumn.ColumnUnique, &tableColumn.IsNullable, &tableColumn.ColumnDefault, &tableColumn.ColumnComment); err != nil {
-			fmt.Println("查询失败", TablesColumnSql, err)
-			return nil
-		}
+	tableColumns := make([]TableColumn, 0)
+	for rows.Next() {
 		if set.Contains(tableName) {
 			continue
 		}
+
+		tableColumn := TableColumn{}
+		if err := rows.Scan(&tableColumn.TableName, &tableColumn.ColumnName, &tableColumn.ColumnType, &tableColumn.ColumnKey, &tableColumn.ColumnUnique, &tableColumn.IsNullable, &tableColumn.ColumnDefault, &tableColumn.ColumnComment); err != nil {
+			fmt.Println("数据加载失败", tableName, err)
+			return nil
+		}
+		tableColumns = append(tableColumns, tableColumn)
 	}
-	return make([]map[string]string, 0)
+	return tableColumns
 }
