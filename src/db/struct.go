@@ -12,6 +12,6 @@ type TableColumn struct {
 	ColumnKey     string
 	ColumnUnique  string
 	IsNullable    string
-	ColumnDefault *string
+	ColumnDefault string
 	ColumnComment string
 }

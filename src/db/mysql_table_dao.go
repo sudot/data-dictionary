@@ -34,58 +34,71 @@ const TablesColumnSql string = "" +
 	"         CASE COL.COLUMN_KEY WHEN 'PRI' THEN 0 ELSE 1 END ASC,\n" +
 	"         COL.COLUMN_NAME ASC"
 
-func init() {
+type MySqlTableDao struct {
+	TableDao
+	config            src.Config
+	db                *sql.DB
+	excludeTableNames *src.Set
 }
 
-func Connection(config src.Config) []TableColumn {
+func NewMySqlTableDao(config src.Config) *MySqlTableDao {
+	excludeTableNames := src.New()
+	for _, v := range strings.Split(config.ExcludeTables, ",") {
+		excludeTableNames.Add(v)
+	}
+
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", config.User, config.Password, config.Host, config.Schema))
+	// 运行后程序就退出了,所以无需关闭db
 	if err != nil {
 		fmt.Println("数据库连接失败", err)
 		return nil
 	}
-	defer db.Close()
-	rows, err := db.Query(TablesSql, config.Schema)
+	return &MySqlTableDao{config: config, db: db, excludeTableNames: excludeTableNames}
+}
+func (tableDao *MySqlTableDao) Tables() ([]Table, error) {
+	rows, err := tableDao.db.Query(TablesSql, tableDao.config.Schema)
+	defer rows.Close()
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
-		return nil
+		return nil, err
 	}
-	defer rows.Close()
-
-	set := src.New()
-	for _, v := range strings.Split(config.ExcludeTables, ",") {
-		set.Add(v)
-	}
-	var tableName, tableComment string
-	tableColumnCommentMap := make(map[string]string)
+	tables := make([]Table, 0)
 	for rows.Next() {
-		if err := rows.Scan(&tableName, &tableComment); err != nil {
+		table := Table{}
+		if err := rows.Scan(&table.Name, &table.Comment); err != nil {
 			fmt.Println("查询失败", TablesSql, err)
-			return nil
+			return nil, err
 		}
-		if set.Contains(tableName) {
+		if tableDao.excludeTableNames.Contains(table.Name) {
 			continue
 		}
-		tableColumnCommentMap[tableName] = tableComment
+		tables = append(tables, table)
 	}
+	return tables, nil
+}
 
-	rows, err = db.Query(TablesColumnSql, config.Schema)
+func (tableDao *MySqlTableDao) Columns() ([]TableColumn, error) {
+	rows, err := tableDao.db.Query(TablesColumnSql, tableDao.config.Schema)
 	defer rows.Close()
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
-		return nil
+		return nil, err
 	}
 	tableColumns := make([]TableColumn, 0)
 	for rows.Next() {
-		if set.Contains(tableName) {
+		tableColumn := TableColumn{}
+		var columnDefault []byte
+		if err := rows.Scan(&tableColumn.TableName, &tableColumn.ColumnName, &tableColumn.ColumnType, &tableColumn.ColumnKey, &tableColumn.ColumnUnique, &tableColumn.IsNullable, &columnDefault, &tableColumn.ColumnComment); err != nil {
+			fmt.Println("数据加载失败", tableColumn.TableName, err)
+			return nil, err
+		}
+		if tableDao.excludeTableNames.Contains(tableColumn.TableName) {
 			continue
 		}
-
-		tableColumn := TableColumn{}
-		if err := rows.Scan(&tableColumn.TableName, &tableColumn.ColumnName, &tableColumn.ColumnType, &tableColumn.ColumnKey, &tableColumn.ColumnUnique, &tableColumn.IsNullable, &tableColumn.ColumnDefault, &tableColumn.ColumnComment); err != nil {
-			fmt.Println("数据加载失败", tableName, err)
-			return nil
+		if columnDefault != nil {
+			tableColumn.ColumnDefault = string(columnDefault)
 		}
 		tableColumns = append(tableColumns, tableColumn)
 	}
-	return tableColumns
+	return tableColumns, nil
 }
