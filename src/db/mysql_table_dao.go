@@ -55,16 +55,16 @@ func NewMySqlTableDao(config src.Config) *MySqlTableDao {
 	}
 	return &MySqlTableDao{config: config, db: db, excludeTableNames: excludeTableNames}
 }
-func (tableDao *MySqlTableDao) Tables() ([]Table, error) {
+func (tableDao *MySqlTableDao) Tables() ([]src.Table, error) {
 	rows, err := tableDao.db.Query(TablesSql, tableDao.config.Schema)
 	defer rows.Close()
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
 		return nil, err
 	}
-	tables := make([]Table, 0)
+	tables := make([]src.Table, 0)
 	for rows.Next() {
-		table := Table{}
+		table := src.Table{}
 		if err := rows.Scan(&table.Name, &table.Comment); err != nil {
 			fmt.Println("查询失败", TablesSql, err)
 			return nil, err
@@ -77,16 +77,16 @@ func (tableDao *MySqlTableDao) Tables() ([]Table, error) {
 	return tables, nil
 }
 
-func (tableDao *MySqlTableDao) Columns() ([]TableColumn, error) {
+func (tableDao *MySqlTableDao) Columns() ([]src.TableColumn, error) {
 	rows, err := tableDao.db.Query(TablesColumnSql, tableDao.config.Schema)
 	defer rows.Close()
 	if err != nil {
 		fmt.Println("数据库信息查询失败", err)
 		return nil, err
 	}
-	tableColumns := make([]TableColumn, 0)
+	tableColumns := make([]src.TableColumn, 0)
 	for rows.Next() {
-		tableColumn := TableColumn{}
+		tableColumn := src.TableColumn{}
 		var columnDefault []byte
 		if err := rows.Scan(&tableColumn.TableName, &tableColumn.ColumnName, &tableColumn.ColumnType, &tableColumn.ColumnKey, &tableColumn.ColumnUnique, &tableColumn.IsNullable, &columnDefault, &tableColumn.ColumnComment); err != nil {
 			fmt.Println("数据加载失败", tableColumn.TableName, err)

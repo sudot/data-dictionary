@@ -17,6 +17,8 @@ type Config struct {
 
 var ConfigValue Config
 
+const HomeSheetName = "总目录"
+
 // 读取的配置文件名称
 const FileName = "in-parameter.ini"
 
