@@ -1,5 +1,7 @@
 # 数据库字典数据生成工具
 
+[点此查看golang版本](https://github.com/sudot/data-dictionary/tree/go)
+
 ### 数据库支持情况
 - MySql
 - Oracle
@@ -15,7 +17,7 @@
 ### 使用编译包运行
 1. [点此下载运行包](https://github.com/sudot/data-dictionary/releases/download/v1.1/data-dictionary-1.1-release.zip)
 2. 解压后修改文件`in-parameter.txt`
-3. 双击加压后`run.bat`脚本即可生成数据字典
+3. 双击解压后的`run.bat`脚本即可生成数据字典
 
 #### 结果预览
 ![image](images/data-dictionary.gif)
