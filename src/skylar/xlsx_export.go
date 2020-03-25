@@ -3,8 +3,8 @@ package skylar
 import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
+	"github.com/sudot/data-dictionary/src"
 	"strconv"
-	"sudot.net/sudot/data-dictionary/src"
 )
 
 func DrawCatalogue(xlsxFile *excelize.File, tables []src.Table) {

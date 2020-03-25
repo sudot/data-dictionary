@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/sudot/data-dictionary/src"
 	"strings"
-	"sudot.net/sudot/data-dictionary/src"
 )
 
 /** 获取指定数据库所有表信息 */

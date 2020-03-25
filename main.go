@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/sudot/data-dictionary/src"
+	"github.com/sudot/data-dictionary/src/db"
+	"github.com/sudot/data-dictionary/src/tealeg"
 	"github.com/tealeg/xlsx"
 	"os"
-	"sudot.net/sudot/data-dictionary/src"
-	"sudot.net/sudot/data-dictionary/src/db"
-	"sudot.net/sudot/data-dictionary/src/tealeg"
 )
 
 func main() {

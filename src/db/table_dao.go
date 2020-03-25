@@ -1,6 +1,6 @@
 package db
 
-import "sudot.net/sudot/data-dictionary/src"
+import "github.com/sudot/data-dictionary/src"
 
 type TableDao interface {
 	// 获取所有的表信息

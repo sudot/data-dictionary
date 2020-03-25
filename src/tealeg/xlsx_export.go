@@ -2,9 +2,9 @@ package tealeg
 
 import (
 	"fmt"
+	"github.com/sudot/data-dictionary/src"
 	"github.com/tealeg/xlsx"
 	"strconv"
-	"sudot.net/sudot/data-dictionary/src"
 )
 
 func init() {
