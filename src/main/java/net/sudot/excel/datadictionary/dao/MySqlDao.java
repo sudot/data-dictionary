@@ -1,5 +1,6 @@
 package net.sudot.excel.datadictionary.dao;
 
+import net.sudot.excel.datadictionary.annotation.MeteData;
 import net.sudot.excel.datadictionary.dto.Table;
 import net.sudot.excel.datadictionary.dto.TableColumn;
 
@@ -17,7 +18,8 @@ import java.util.Set;
  *
  * @author tangjialin on 2019-03-02.
  */
-public class MySqlTableDao implements TableDao {
+@MeteData(databaseProductName = "MySQL", driveClassName = "com.mysql.cj.jdbc.Driver")
+public class MySqlDao implements IDao {
     /** 获取指定数据库所有表信息 */
     private static final String TABLES_SQL = "SELECT TABLE_NAME,TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME ASC";
     /**
@@ -52,7 +54,7 @@ public class MySqlTableDao implements TableDao {
      * @param connection    数据库连接对象
      * @param excludeTables 需要排除的表名
      */
-    public MySqlTableDao(Connection connection, Set<String> excludeTables) {
+    public MySqlDao(Connection connection, Set<String> excludeTables) {
         this.connection = connection;
         this.excludeTables = excludeTables;
     }

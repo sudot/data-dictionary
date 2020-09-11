@@ -37,6 +37,11 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/assembly/lib/ojdbc6-11.2.0.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.31.1</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>

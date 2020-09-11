@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @author tangjialin on 2019-03-02.
  */
-public interface TableDao {
+public interface IDao {
 
     /**
      * 获取所有的数据表信息

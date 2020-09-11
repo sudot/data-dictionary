@@ -1,9 +1,8 @@
 package net.sudot.excel.datadictionary.excel;
 
 import net.sudot.excel.datadictionary.Constant;
-import net.sudot.excel.datadictionary.dao.MySqlTableDao;
-import net.sudot.excel.datadictionary.dao.OracleTableDao;
-import net.sudot.excel.datadictionary.dao.TableDao;
+import net.sudot.excel.datadictionary.dao.DaoFactory;
+import net.sudot.excel.datadictionary.dao.IDao;
 import net.sudot.excel.datadictionary.dto.InParameter;
 import net.sudot.excel.datadictionary.dto.Table;
 import net.sudot.excel.datadictionary.dto.TableColumn;
@@ -34,14 +33,6 @@ import java.util.stream.Collectors;
  * @author tangjialin on 2019-03-01.
  */
 public abstract class WriteWorkbook {
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Class.forName("oracle.jdbc.OracleDriver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 写入文件操作
@@ -56,15 +47,10 @@ public abstract class WriteWorkbook {
         }
 
         try (Connection connection = DriverManager.getConnection(inParameter.getUrl(), inParameter.getUser(), inParameter.getPassword())) {
-            connection.setReadOnly(true);
-            String databaseProductName = connection.getMetaData().getDatabaseProductName();
-            TableDao tableDao = new MySqlTableDao(connection, excludeTables);
-            if ("Oracle".equals(databaseProductName)) {
-                tableDao = new OracleTableDao(connection, excludeTables);
-            }
-            List<Table> tables = tableDao.listTables(inParameter.getSchema());
+            IDao dao = DaoFactory.newInstance(connection, excludeTables);
+            List<Table> tables = dao.listTables(inParameter.getSchema());
             List<String> tableNames = tables.stream().map(Table::getName).collect(Collectors.toList());
-            Map<String, List<TableColumn>> tableColumns = tableDao.listTableColumns(inParameter.getSchema(), tableNames);
+            Map<String, List<TableColumn>> tableColumns = dao.listTableColumns(inParameter.getSchema(), tableNames);
 
             Workbook workbook = drawCatalogue(WorkbookFactory.create(true), tables);
             drawTableColumns(workbook, tables, tableColumns);

@@ -39,7 +39,7 @@ public abstract class CellUtils {
         int length = text.getBytes(CHARSET).length;
         // 优化大写字母导致宽度不够
         length += PATTERN.matcher(text).find() ? length / LENGTH : 0;
-        return length > maxLength ? length : maxLength;
+        return Math.max(length, maxLength);
     }
 
     public static int drawColumnText(Row row, int cellIndex, String text, int maxLength) {

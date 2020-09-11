@@ -11,6 +11,13 @@ file-path=D:/test-mysql.xlsx
 #exclude-tables-string=TABLE_NAME_03, TABLE_NAME_04, TABLE_NAME_05
 #file-path=D:/test-oracle.xlsx
 
+#url=jdbc:sqlite:moneywiz_db.sql
+#user=root
+#password=root
+#schema=test
+#exclude-tables-string=table_name_01, table_name_03
+#file-path=D:/test-sqlite.xlsx
+
 ##数据库连接
 #url=jdbc:mysql://127.0.0.1:3306/test?useUnicode=yes&characterEncoding=UTF8&useSSL=false&serverTimezone=Asia/Shanghai
 ##数据库登录用户

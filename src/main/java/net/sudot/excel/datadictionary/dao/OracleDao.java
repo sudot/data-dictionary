@@ -1,6 +1,7 @@
 package net.sudot.excel.datadictionary.dao;
 
 import net.sudot.excel.datadictionary.Constant;
+import net.sudot.excel.datadictionary.annotation.MeteData;
 import net.sudot.excel.datadictionary.dto.Table;
 import net.sudot.excel.datadictionary.dto.TableColumn;
 
@@ -19,7 +20,8 @@ import java.util.Set;
  *
  * @author tangjialin on 2019-03-02.
  */
-public class OracleTableDao implements TableDao {
+@MeteData(databaseProductName = "Oracle", driveClassName = "oracle.jdbc.OracleDriver")
+public class OracleDao implements IDao {
     /** 获取指定数据库所有表信息 */
     private static final String TABLES_SQL = "SELECT TABLE_NAME,COMMENTS FROM USER_TAB_COMMENTS ORDER BY TABLE_NAME ASC";
     /**
@@ -63,7 +65,7 @@ public class OracleTableDao implements TableDao {
      * @param connection    数据库连接对象
      * @param excludeTables 需要排除的表名
      */
-    public OracleTableDao(Connection connection, Set<String> excludeTables) {
+    public OracleDao(Connection connection, Set<String> excludeTables) {
         this.connection = connection;
         this.excludeTables = excludeTables;
     }

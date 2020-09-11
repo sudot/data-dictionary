@@ -13,6 +13,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 public class Table {
+    /** 表名 */
     private String name;
+    /** 表注释 */
     private String comment;
 }
