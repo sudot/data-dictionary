@@ -3,7 +3,7 @@ package skylar
 import (
 	"fmt"
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
-	"github.com/sudot/data-dictionary/src"
+	"github.com/sudot/data-dictionary/internal"
 	"strconv"
 )
 

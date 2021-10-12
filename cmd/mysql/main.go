@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/sudot/data-dictionary/src"
-	"github.com/sudot/data-dictionary/src/db"
-	"github.com/sudot/data-dictionary/src/tealeg"
+	"github.com/sudot/data-dictionary/internal"
+	"github.com/sudot/data-dictionary/internal/db"
+	"github.com/sudot/data-dictionary/internal/tealeg"
 	"github.com/tealeg/xlsx"
 	"os"
 )

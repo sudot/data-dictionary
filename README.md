@@ -9,8 +9,8 @@
     git clone git@github.com:sudot/data-dictionary.git
     git checkout -b go
     ```
-2. 修改文件`in-parameter.txt`相关信息
-3. 运行`main.go`类的`main`方法
+2. 修改文件`cmd/mysql/in-parameter.txt`相关信息
+3. 运行`cmd/mysql/main.go`类的`main`方法
 
 ### 使用编译包运行
 1. [点此下载运行包](https://github.com/sudot/data-dictionary/releases/download/v2.0/data-dictionary-2.0-release.zip)

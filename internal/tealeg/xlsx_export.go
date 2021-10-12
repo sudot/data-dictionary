@@ -2,7 +2,7 @@ package tealeg
 
 import (
 	"fmt"
-	"github.com/sudot/data-dictionary/src"
+	"github.com/sudot/data-dictionary/internal"
 	"github.com/tealeg/xlsx"
 	"strconv"
 )
@@ -11,12 +11,11 @@ func init() {
 	xlsx.SetDefaultFont(11, "宋体")
 }
 
-/**
- * 绘制表目录
- *
- * @param xlsxFile 表格文件
- * @param tables   数据表信息
- */
+// DrawCatalogue
+//  绘制表目录
+//
+//  @param xlsxFile 表格文件
+//  @param tables   数据表信息
 func DrawCatalogue(xlsxFile *xlsx.File, tables []src.Table) {
 	sheet, err := xlsxFile.AddSheet(src.HomeSheetName)
 	if err != nil {
@@ -53,13 +52,13 @@ func DrawCatalogue(xlsxFile *xlsx.File, tables []src.Table) {
 
 }
 
-/**
- * 绘制每一个数据表的字段信息
- *
- * @param xlsxFile     表格文件
- * @param tables       数据表信息
- * @param tableColumns 数据表字段信息
- */
+// DrawTableColumns
+//
+//  绘制每一个数据表的字段信息
+//
+//  @param xlsxFile     表格文件
+//  @param tables       数据表信息
+//  @param tableColumns 数据表字段信息
 func DrawTableColumns(xlsxFile *xlsx.File, tables []src.Table, tableColumns map[string][]src.TableColumn) {
 	for _, table := range tables {
 		sheet, _ := xlsxFile.AddSheet(table.Name)
@@ -106,13 +105,12 @@ func DrawTableColumns(xlsxFile *xlsx.File, tables []src.Table, tableColumns map[
 	}
 }
 
-/**
- * 绘制表格字段详情头信息
- *
- * @param sheet    工作表
- * @param table    表信息
- * @return 返回工作薄实例
- */
+// drawTablesSheetHeader
+//  绘制表格字段详情头信息
+//
+//  @param sheet    工作表
+//  @param table    表信息
+//  @return 返回工作薄实例
 func drawTablesSheetHeader(sheet *xlsx.Sheet, table src.Table) {
 	row := sheet.AddRow()
 	row.AddCell().Value = "表名"

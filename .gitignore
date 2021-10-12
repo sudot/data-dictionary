@@ -5,10 +5,11 @@
 /*
 
 #以下是排除忽略的文件,即:加入版本控制的文件
-!src
+!cmd
+!internal
 !images
 !main.go
 !go.mod
 !README.md
-!in-parameter.ini
+!cmd/mysql/in-parameter.ini
 !/*.gitignore

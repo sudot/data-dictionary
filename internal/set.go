@@ -1,6 +1,6 @@
 package src
 
-// 空结构体
+// Exists 空结构体
 var Exists = struct{}{}
 
 // Set is the main interface
