@@ -30,11 +30,15 @@ func main() {
 	var contents []string
 	contents = append(contents, "package main")
 
-	for tableName, columns := range tableColumns {
-		structContent := fmt.Sprintf("type %s []struct {", tableName)
+	for _, table := range tables {
+		columns := tableColumns[table.Name]
+		structContent := fmt.Sprintf("type %s []struct {", table.Name)
 		for _, column := range columns {
-
-			structContent += fmt.Sprintf("%s %s `json:\"%s\"`\n", StructName(column.ColumnName), SqliteType2GoType(column.ColumnType), column.ColumnName)
+			structContent += fmt.Sprintf("%s %s `json:\"%s\"`\n",
+				StructName(column.ColumnName),
+				SqliteType2GoType(column.ColumnType),
+				column.ColumnName,
+			)
 		}
 		structContent += "}"
 		contents = append(contents, structContent)
