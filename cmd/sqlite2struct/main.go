@@ -45,6 +45,9 @@ func main() {
 
 // ConvertCamelName 转驼峰并且首字母大写
 func ConvertCamelName(name string) string {
+	if strings.EqualFold(name, "id") {
+		return "ID"
+	}
 	out := make([]rune, 0, len(name))
 	isUnderline := false
 	for i, c := range name {
