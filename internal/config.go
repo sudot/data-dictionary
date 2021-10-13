@@ -1,9 +1,8 @@
 package src
 
 import (
-	"fmt"
 	"github.com/Unknwon/goconfig"
-	"os"
+	"log"
 )
 
 type Config struct {
@@ -26,9 +25,7 @@ func init() {
 	// 加载配置文件
 	cfg, err := goconfig.LoadConfigFile(FileName)
 	if err != nil {
-		fmt.Println("配置文件不存在\r\n请按回车键继续")
-		os.Stdin.Read(make([]byte, 1))
-		os.Exit(-1)
+		log.Fatal("配置文件[config.ini]不存在")
 	}
 	ConfigValue = Config{
 		Host:          getConfigValue(cfg, "host"),
@@ -43,7 +40,7 @@ func init() {
 func getConfigValue(cfg *goconfig.ConfigFile, key string) string {
 	value, err := cfg.GetValue("", key)
 	if err != nil {
-		println("host读取失败", err)
+		log.Printf("%s读取失败：%s", key, err)
 	}
 	return value
 }

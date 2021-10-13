@@ -6,7 +6,7 @@ import (
 	"github.com/sudot/data-dictionary/internal/db"
 	"io/fs"
 	"io/ioutil"
-	"os"
+	"log"
 	"strings"
 )
 
@@ -14,17 +14,12 @@ func main() {
 	config := src.ConfigValue
 	tableDao := db.NewSqliteTableDao(config)
 	tables, err := tableDao.Tables()
-	inputBytes := make([]byte, 1)
 	if err != nil {
-		fmt.Println("表信息获取失败\r\n请按回车键继续")
-		os.Stdin.Read(inputBytes)
-		os.Exit(-1)
+		log.Fatal("表信息获取失败")
 	}
 	tableColumns, err := tableDao.Columns(tables)
 	if err != nil {
-		fmt.Println("表字段信息获取失败\r\n请按回车键继续")
-		os.Stdin.Read(inputBytes)
-		os.Exit(-1)
+		log.Fatal("表字段信息获取失败")
 	}
 
 	var contents []string
@@ -45,7 +40,7 @@ func main() {
 	}
 
 	ioutil.WriteFile(config.FilePath, []byte(strings.Join(contents, "\n\n")), fs.ModePerm)
-	fmt.Printf("数据字典已成功导出到:%s", config.FilePath)
+	log.Printf("数据字典已成功导出到:%s", config.FilePath)
 }
 
 // ConvertCamelName 转驼峰并且首字母大写
