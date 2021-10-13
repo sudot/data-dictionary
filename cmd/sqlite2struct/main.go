@@ -27,9 +27,9 @@ func main() {
 
 	for _, table := range tables {
 		columns := tableColumns[table.Name]
-		structContent := fmt.Sprintf("type %s []struct {", ConvertCamelName(table.Name))
+		structContent := fmt.Sprintf("type %s struct {\n", ConvertCamelName(table.Name))
 		for _, column := range columns {
-			structContent += fmt.Sprintf("%s %s `json:\"%s\"`\n",
+			structContent += fmt.Sprintf("%s %s `db:\"%s\"`\n",
 				ConvertCamelName(column.ColumnName),
 				SqliteType2GoType(column.ColumnType),
 				column.ColumnName,
